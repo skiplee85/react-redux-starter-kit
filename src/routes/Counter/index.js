@@ -1,5 +1,3 @@
-import { injectReducer } from '../../store/reducers'
-
 export default (store) => ({
   path : 'counter',
   /*  Async getComponent is only invoked when route matches   */
@@ -13,7 +11,7 @@ export default (store) => ({
       const reducer = require('./modules/counter').default
 
       /*  Add the reducer to the store on key 'counter'  */
-      injectReducer(store, { key: 'counter', reducer })
+      store.injectReducer('counter', reducer)
 
       /*  Return getComponent   */
       cb(null, Counter)

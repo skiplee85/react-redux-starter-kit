@@ -1,14 +1,17 @@
 import { applyMiddleware, compose, createStore as createReduxStore } from 'redux'
 import thunk from 'redux-thunk'
-import { browserHistory } from 'react-router'
+import logger from 'redux-logger'
+import createSagaMiddleware from 'redux-saga'
 import makeRootReducer from './reducers'
-import { updateLocation } from './location'
+import addAsyncInjectors from '../utils/asyncInjectors'
+
+const sagaMiddleware = createSagaMiddleware()
 
 const createStore = (initialState = {}) => {
   // ======================================================
   // Middleware Configuration
   // ======================================================
-  const middleware = [thunk]
+  const middleware = [thunk, sagaMiddleware]
 
   // ======================================================
   // Store Enhancers
@@ -20,6 +23,7 @@ const createStore = (initialState = {}) => {
     if (typeof window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ === 'function') {
       composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     }
+    middleware.push(logger)
   }
 
   // ======================================================
@@ -34,9 +38,8 @@ const createStore = (initialState = {}) => {
     )
   )
   store.asyncReducers = {}
-
-  // To unsubscribe, invoke `store.unsubscribeHistory()` anytime
-  store.unsubscribeHistory = browserHistory.listen(updateLocation(store))
+  store.runSaga = sagaMiddleware.run
+  addAsyncInjectors(store, makeRootReducer)
 
   if (module.hot) {
     module.hot.accept('./reducers', () => {
