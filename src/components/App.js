@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 import PropTypes from 'prop-types'
 import LanguageProvider from './LanguageProvider'
 import languageProviderReducer from './LanguageProvider/reducer'
+import languageProviderSaga from './LanguageProvider/saga'
 
 class App extends React.Component {
   static propTypes = {
@@ -20,7 +21,8 @@ class App extends React.Component {
   render () {
     const { routes, store } = this.props
     const history = syncHistoryWithStore(browserHistory, store)
-    store.injectReducer('locale', languageProviderReducer)
+    store.injectReducer('lang', languageProviderReducer)
+    store.injectSagas(languageProviderSaga)
     return (
       <Provider store={this.props.store}>
         <LanguageProvider>
